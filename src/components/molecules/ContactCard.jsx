@@ -11,6 +11,7 @@ const ContactCard = ({
   onClick,
   onEdit,
   onDelete,
+  onComposeEmail,
   className = "",
   ...props 
 }) => {
