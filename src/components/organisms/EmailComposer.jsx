@@ -45,14 +45,14 @@ const EmailComposer = ({
     }
   };
 
-  const populateRecipient = () => {
+const populateRecipient = () => {
     if (contact) {
       setFormData(prev => ({
-to: contact.email || "",
+        ...prev,
+        to: contact.email || "",
         subject: `Follow-up: ${contact.Name || contact.name}`,
         body: ""
       }));
-    } else if (deal) {
     } else if (deal) {
       setFormData(prev => ({
         ...prev,
