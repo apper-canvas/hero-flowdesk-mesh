@@ -4,7 +4,7 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-  theme: {
+theme: {
     extend: {
       colors: {
         primary: {
@@ -59,10 +59,17 @@ export default {
         warning: '#FF9500',
         error: '#FF3B30',
         info: '#007AFF',
+        ring: 'rgb(59 130 246 / 0.5)',
       },
       fontFamily: {
         sans: ['Inter', 'ui-sans-serif', 'system-ui'],
         display: ['Plus Jakarta Sans', 'ui-sans-serif', 'system-ui'],
+      },
+      ringColor: {
+        'primary-500': 'rgb(91 79 219 / 0.2)',
+      },
+      ringOffsetColor: {
+        'background': '#fff',
       },
       animation: {
         'fade-in': 'fadeIn 0.3s ease-out',
