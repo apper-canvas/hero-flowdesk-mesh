@@ -1,0 +1,82 @@
+[
+  {
+    "Id": 1,
+    "type": "call",
+    "contactId": "1",
+    "dealId": "1",
+    "description": "Initial discovery call to discuss enterprise software needs",
+    "timestamp": "2024-01-15T10:30:00Z"
+  },
+  {
+    "Id": 2,
+    "type": "email",
+    "contactId": "2",
+    "dealId": "2",
+    "description": "Sent proposal for website redesign project",
+    "timestamp": "2024-01-14T14:20:00Z"
+  },
+  {
+    "Id": 3,
+    "type": "meeting",
+    "contactId": "3",
+    "dealId": "3",
+    "description": "Demo session for cloud migration platform",
+    "timestamp": "2024-01-13T16:45:00Z"
+  },
+  {
+    "Id": 4,
+    "type": "note",
+    "contactId": "4",
+    "dealId": "4",
+    "description": "Client decided to go with internal team for marketing campaign",
+    "timestamp": "2024-01-12T12:00:00Z"
+  },
+  {
+    "Id": 5,
+    "type": "call",
+    "contactId": "5",
+    "dealId": "5",
+    "description": "Follow-up call to discuss business process requirements",
+    "timestamp": "2024-01-12T09:15:00Z"
+  },
+  {
+    "Id": 6,
+    "type": "email",
+    "contactId": "6",
+    "dealId": "6",
+    "description": "Shared e-commerce platform case studies and pricing",
+    "timestamp": "2024-01-11T11:30:00Z"
+  },
+  {
+    "Id": 7,
+    "type": "meeting",
+    "contactId": "7",
+    "dealId": "7",
+    "description": "Stakeholder meeting to present financial software solution",
+    "timestamp": "2024-01-10T14:20:00Z"
+  },
+  {
+    "Id": 8,
+    "type": "email",
+    "contactId": "8",
+    "dealId": "8",
+    "description": "Contract signed for healthcare management system implementation",
+    "timestamp": "2024-01-09T16:00:00Z"
+  },
+  {
+    "Id": 9,
+    "type": "task",
+    "contactId": "1",
+    "dealId": "1",
+    "description": "Prepare technical documentation for enterprise software proposal",
+    "timestamp": "2024-01-08T10:00:00Z"
+  },
+  {
+    "Id": 10,
+    "type": "call",
+    "contactId": "2",
+    "dealId": "2",
+    "description": "Budget confirmation call for website redesign project",
+    "timestamp": "2024-01-07T15:30:00Z"
+  }
+]
