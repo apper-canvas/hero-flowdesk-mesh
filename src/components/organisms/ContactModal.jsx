@@ -109,7 +109,7 @@ const contactData = {
         phone: formData.phone,
         company: formData.company,
         status: formData.status,
-        Tags: formData.tags.split(",").map(tag => tag.trim()).filter(Boolean)
+        Tags: formData.tags.split(",").map(tag => tag.trim()).filter(Boolean).join(",")
       };
       
       let savedContact;
