@@ -3,8 +3,8 @@ import { useDispatch } from "react-redux";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "react-toastify";
 import { format } from "date-fns";
-import { addActivity } from "@/store/activitySlice";
 import { cn } from "@/utils/cn";
+import { addActivity } from "@/store/activitySlice";
 import ApperIcon from "@/components/ApperIcon";
 import Badge from "@/components/atoms/Badge";
 import Button from "@/components/atoms/Button";
@@ -119,8 +119,8 @@ const handleSubmit = async (e) => {
         toast.success("Contact created successfully!");
         activityType = "note";
       }
-      
-      // Create activity record for this action
+// Create activity record for this action
+      let newActivity = null;
       try {
         const activityData = {
           type: activityType,
@@ -131,13 +131,12 @@ const handleSubmit = async (e) => {
           contactId: savedContact.Id
         };
         
-        const newActivity = await activityService.create(activityData);
+        newActivity = await activityService.create(activityData);
         
         // Add to Redux store for immediate dashboard update
         if (newActivity) {
           dispatch(addActivity(newActivity));
         }
-}
         
         // Dispatch global event for dashboard refresh
         window.dispatchEvent(new window.CustomEvent('activityCreated', { 
@@ -145,11 +144,13 @@ const handleSubmit = async (e) => {
         }));
       } catch (activityError) {
         // Don't fail the main operation if activity creation fails
+        console.error("Activity creation failed:", activityError);
       }
       
       onSave(savedContact);
       onClose();
-// Dispatch global data change event
+      
+      // Dispatch global data change event
       window.dispatchEvent(new window.CustomEvent('dataChanged'));
     } catch (error) {
       console.error("Error saving contact:", error);
