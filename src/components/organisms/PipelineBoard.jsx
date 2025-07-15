@@ -13,6 +13,7 @@ const PipelineBoard = ({
   onEditDeal,
   onDeleteDeal,
   onComposeEmail,
+  onDealClick,
   className = "",
   ...props 
 }) => {
@@ -53,9 +54,10 @@ const PipelineBoard = ({
     }
   };
 
-  const handleDealClick = (deal) => {
-    // Handle deal click (could open detail modal)
-    console.log("Deal clicked:", deal);
+const handleDealClick = (deal) => {
+    if (onDealClick) {
+      onDealClick(deal);
+    }
   };
 
   const handleEditDeal = (deal) => {

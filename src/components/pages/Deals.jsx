@@ -112,6 +112,7 @@ const handleSaveDeal = (savedDeal) => {
               onEditDeal={handleEditDeal}
               onDeleteDeal={handleDeleteDeal}
               onComposeEmail={handleComposeEmail}
+              onDealClick={handleEditDeal}
               className="h-full"
             />
           </motion.div>
