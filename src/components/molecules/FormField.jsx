@@ -1,17 +1,17 @@
 import React from "react";
 import { cn } from "@/utils/cn";
-import Input from "@/components/atoms/Input";
 import Select from "@/components/atoms/Select";
 import Textarea from "@/components/atoms/Textarea";
+import Input from "@/components/atoms/Input";
 
-const FormField = ({ 
+export default function FormField({ 
   label, 
-  type = "input", 
-  error, 
+  type = "text", 
+  error,
   required = false, 
   className = "",
   ...props 
-}) => {
+}) {
   const renderField = () => {
     switch (type) {
       case "select":
@@ -28,15 +28,13 @@ const FormField = ({
       {label && (
         <label className="block text-sm font-medium text-gray-700 mb-1">
           {label}
-          {required && <span className="text-accent-500 ml-1">*</span>}
+          {required && <span className="text-red-500 ml-1">*</span>}
         </label>
       )}
       {renderField()}
       {error && (
-        <p className="text-sm text-error mt-1">{error}</p>
+        <p className="text-sm text-red-600 mt-1">{error}</p>
       )}
     </div>
   );
-};
-
-export default FormField;
+}

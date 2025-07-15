@@ -256,14 +256,13 @@ const contactOptions = contacts.map(contact => ({
               placeholder="Select a contact"
             />
             
-            <FormField
+<FormField
               label="Probability (%)"
-              type="number"
+              type="range"
               value={formData.probability}
               onChange={(e) => handleInputChange("probability", e.target.value)}
               error={errors.probability}
               required
-              placeholder="Enter probability (0-100)"
               min="0"
               max="100"
             />
