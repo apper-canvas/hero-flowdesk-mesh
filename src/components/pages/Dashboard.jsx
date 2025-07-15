@@ -125,7 +125,7 @@ const loadDashboardData = async (silent = false) => {
   };
 
 const getRecentActivities = () => {
-    return activities
+    return [...activities]
       .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
       .slice(0, 5);
   };
