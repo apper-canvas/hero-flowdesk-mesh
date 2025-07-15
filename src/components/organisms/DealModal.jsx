@@ -143,9 +143,9 @@ const DealModal = ({
 
   if (!isOpen) return null;
 
-  const contactOptions = contacts.map(contact => ({
+const contactOptions = contacts.map(contact => ({
     value: contact.Id.toString(),
-    label: `${contact.name} (${contact.company})`
+    label: `${contact.Name || contact.name} (${contact.company})`
   }));
 
   return (

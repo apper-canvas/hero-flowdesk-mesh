@@ -31,14 +31,14 @@ const ContactModal = ({
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    if (contact) {
+if (contact) {
       setFormData({
-        name: contact.name || "",
+        name: contact.Name || contact.name || "",
         email: contact.email || "",
         phone: contact.phone || "",
         company: contact.company || "",
         status: contact.status || "lead",
-        tags: contact.tags ? contact.tags.join(", ") : ""
+        tags: contact.Tags ? (Array.isArray(contact.Tags) ? contact.Tags.join(", ") : contact.Tags) : (contact.tags ? contact.tags.join(", ") : "")
       });
     } else {
       setFormData({
@@ -154,7 +154,7 @@ const ContactModal = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                  <p className="text-gray-900 font-medium">{contact?.name || "-"}</p>
+<p className="text-gray-900 font-medium">{contact?.Name || contact?.name || "-"}</p>
                 </div>
                 
                 <div>
@@ -184,11 +184,11 @@ const ContactModal = ({
                   <p className="text-gray-900">{contact?.company || "-"}</p>
                 </div>
                 
-                {contact?.tags && contact.tags.length > 0 && (
+{((contact?.Tags && contact.Tags.length > 0) || (contact?.tags && contact.tags.length > 0)) && (
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">Tags</label>
                     <div className="flex flex-wrap gap-1">
-                      {contact.tags.map((tag, index) => (
+                      {(contact.Tags || contact.tags || []).map((tag, index) => (
                         <Badge key={index} variant="default" size="sm">
                           {tag}
                         </Badge>
@@ -197,10 +197,10 @@ const ContactModal = ({
                   </div>
                 )}
                 
-                {contact?.lastContacted && (
+{(contact?.lastContacted || contact?.last_contacted) && (
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1">Last Contacted</label>
-                    <p className="text-gray-900">{format(new Date(contact.lastContacted), "MMM dd, yyyy 'at' h:mm a")}</p>
+                    <p className="text-gray-900">{format(new Date(contact.lastContacted || contact.last_contacted), "MMM dd, yyyy 'at' h:mm a")}</p>
                   </div>
                 )}
               </div>

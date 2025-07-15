@@ -74,9 +74,9 @@ useEffect(() => {
     // Search filter
     if (searchTerm) {
       filtered = filtered.filter(contact =>
-        contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        contact.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        contact.company.toLowerCase().includes(searchTerm.toLowerCase())
+(contact.Name && contact.Name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (contact.email && contact.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (contact.company && contact.company.toLowerCase().includes(searchTerm.toLowerCase()))
       );
     }
 

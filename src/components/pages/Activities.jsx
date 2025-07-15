@@ -63,9 +63,9 @@ const [searchTerm, setSearchTerm] = useState("");
 
     // Search filter
     if (searchTerm) {
-      filtered = filtered.filter(activity =>
-        activity.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        activity.type.toLowerCase().includes(searchTerm.toLowerCase())
+filtered = filtered.filter(activity =>
+        (activity.description && activity.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (activity.type && activity.type.toLowerCase().includes(searchTerm.toLowerCase()))
       );
     }
 

@@ -48,11 +48,11 @@ const EmailComposer = ({
   const populateRecipient = () => {
     if (contact) {
       setFormData(prev => ({
-        ...prev,
-        to: contact.email || "",
-        subject: `Follow-up: ${contact.name}`,
+to: contact.email || "",
+        subject: `Follow-up: ${contact.Name || contact.name}`,
         body: ""
       }));
+    } else if (deal) {
     } else if (deal) {
       setFormData(prev => ({
         ...prev,
@@ -175,7 +175,7 @@ const EmailComposer = ({
                 Compose Email
               </h2>
               <p className="text-sm text-gray-600">
-                {contact ? `To: ${contact.name}` : deal ? `Regarding: ${deal.title}` : "New Email"}
+{contact ? `To: ${contact.Name || contact.name}` : deal ? `Regarding: ${deal.title}` : "New Email"}
               </p>
             </div>
           </div>
