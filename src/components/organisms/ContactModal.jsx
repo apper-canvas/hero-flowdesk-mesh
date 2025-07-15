@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "react-toastify";
 import { format } from "date-fns";
+import { addActivity } from "@/store/activitySlice";
 import { cn } from "@/utils/cn";
 import ApperIcon from "@/components/ApperIcon";
 import Badge from "@/components/atoms/Badge";
 import Button from "@/components/atoms/Button";
 import FormField from "@/components/molecules/FormField";
 import { contactService } from "@/services/api/contactService";
+import { activityService } from "@/services/api/activityService";
 
 const ContactModal = ({ 
   isOpen,
@@ -19,6 +22,7 @@ const ContactModal = ({
   className = "",
   ...props 
 }) => {
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -89,7 +93,7 @@ if (contact) {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!validateForm()) {
@@ -105,16 +109,48 @@ if (contact) {
       };
       
       let savedContact;
+      let activityType;
       if (contact) {
         savedContact = await contactService.update(contact.Id, contactData);
         toast.success("Contact updated successfully!");
+        activityType = "note";
       } else {
         savedContact = await contactService.create(contactData);
         toast.success("Contact created successfully!");
+        activityType = "note";
+      }
+      
+      // Create activity record for this action
+      try {
+        const activityData = {
+          type: activityType,
+          description: contact 
+            ? `Updated contact: ${contactData.name || contactData.Name}`
+            : `Created new contact: ${contactData.name || contactData.Name}`,
+          timestamp: new Date().toISOString(),
+          contactId: savedContact.Id
+        };
+        
+        const newActivity = await activityService.create(activityData);
+        
+        // Add to Redux store for immediate dashboard update
+        if (newActivity) {
+          dispatch(addActivity(newActivity));
+        }
+}
+        
+        // Dispatch global event for dashboard refresh
+        window.dispatchEvent(new window.CustomEvent('activityCreated', { 
+          detail: { activity: newActivity, contact: savedContact } 
+        }));
+      } catch (activityError) {
+        // Don't fail the main operation if activity creation fails
       }
       
       onSave(savedContact);
       onClose();
+// Dispatch global data change event
+      window.dispatchEvent(new window.CustomEvent('dataChanged'));
     } catch (error) {
       console.error("Error saving contact:", error);
       toast.error("Failed to save contact. Please try again.");

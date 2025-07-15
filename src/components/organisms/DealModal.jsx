@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "react-toastify";
+import { addActivity } from "@/store/activitySlice";
 import { cn } from "@/utils/cn";
+import ApperIcon from "@/components/ApperIcon";
 import Button from "@/components/atoms/Button";
 import FormField from "@/components/molecules/FormField";
-import ApperIcon from "@/components/ApperIcon";
-import { dealService } from "@/services/api/dealService";
 import { contactService } from "@/services/api/contactService";
+import { activityService } from "@/services/api/activityService";
+import { dealService } from "@/services/api/dealService";
 
 const DealModal = ({ 
   isOpen,
@@ -16,6 +19,7 @@ const DealModal = ({
   className = "",
   ...props 
 }) => {
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     title: "",
     value: "",
@@ -105,7 +109,7 @@ const DealModal = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!validateForm()) {
@@ -123,16 +127,49 @@ const DealModal = ({
       };
       
       let savedDeal;
+      let activityType;
       if (deal) {
         savedDeal = await dealService.update(deal.Id, dealData);
         toast.success("Deal updated successfully!");
+        activityType = "note";
       } else {
         savedDeal = await dealService.create(dealData);
         toast.success("Deal created successfully!");
+        activityType = "note";
+      }
+      
+      // Create activity record for this action
+      try {
+        const activityData = {
+          type: activityType,
+          description: deal 
+            ? `Updated deal: ${dealData.title} (${dealData.stage})`
+            : `Created new deal: ${dealData.title} (${dealData.stage})`,
+          timestamp: new Date().toISOString(),
+          contactId: dealData.contactId,
+          dealId: savedDeal.Id
+        };
+        
+        const newActivity = await activityService.create(activityData);
+        
+        // Add to Redux store for immediate dashboard update
+        if (newActivity) {
+          dispatch(addActivity(newActivity));
+}
+        
+        // Dispatch global event for dashboard refresh
+        window.dispatchEvent(new window.CustomEvent('activityCreated', { 
+          detail: { activity: newActivity, deal: savedDeal } 
+        }));
+      } catch (activityError) {
+        console.error("Error creating activity:", activityError);
+        // Don't fail the main operation if activity creation fails
       }
       
       onSave(savedDeal);
       onClose();
+// Dispatch global data change event
+      window.dispatchEvent(new window.CustomEvent('dataChanged'));
     } catch (error) {
       console.error("Error saving deal:", error);
       toast.error("Failed to save deal. Please try again.");

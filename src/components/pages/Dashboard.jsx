@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useOutletContext } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
 import { motion } from 'framer-motion'
 import { toast } from 'react-toastify'
 import Header from '@/components/organisms/Header'
@@ -13,12 +14,13 @@ import ActivityItem from "@/components/molecules/ActivityItem";
 import { contactService } from "@/services/api/contactService";
 import { activityService } from "@/services/api/activityService";
 import { dealService } from "@/services/api/dealService";
-
+import { setActivities } from '@/store/activitySlice'
 const Dashboard = () => {
   const { onMenuClick } = useOutletContext();
+  const dispatch = useDispatch();
+  const { activities } = useSelector((state) => state.activity);
   const [contacts, setContacts] = useState([]);
   const [deals, setDeals] = useState([]);
-  const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
@@ -26,7 +28,7 @@ const Dashboard = () => {
   // Auto-refresh interval
   const AUTO_REFRESH_INTERVAL = 30000; // 30 seconds
 
-  useEffect(() => {
+useEffect(() => {
     loadDashboardData();
     
     // Listen for data change events from other components
@@ -34,7 +36,14 @@ const Dashboard = () => {
       loadDashboardData(true); // Silent refresh
     };
     
+    // Listen for activity creation events for immediate updates
+    const handleActivityCreated = (event) => {
+      // Refresh activities immediately when new activity is created
+      loadActivitiesData();
+    };
+    
     window.addEventListener('dataChanged', handleDataChange);
+    window.addEventListener('activityCreated', handleActivityCreated);
     
     // Set up auto-refresh interval
     const intervalId = setInterval(() => {
@@ -43,6 +52,7 @@ const Dashboard = () => {
     
     return () => {
       window.removeEventListener('dataChanged', handleDataChange);
+      window.removeEventListener('activityCreated', handleActivityCreated);
       clearInterval(intervalId);
     };
   }, []);
@@ -66,7 +76,7 @@ const loadDashboardData = async (silent = false) => {
       
       setContacts(contactsData);
       setDeals(dealsData);
-      setActivities(activitiesData);
+      dispatch(setActivities(activitiesData));
       
       if (!silent && refreshing) {
         toast.success("Dashboard data refreshed");
@@ -80,6 +90,15 @@ const loadDashboardData = async (silent = false) => {
     } finally {
       setLoading(false);
       setRefreshing(false);
+    }
+  };
+
+  const loadActivitiesData = async () => {
+    try {
+      const activitiesData = await activityService.getAll();
+      dispatch(setActivities(activitiesData));
+    } catch (err) {
+      console.error("Error loading activities:", err);
     }
   };
 
@@ -105,7 +124,7 @@ const loadDashboardData = async (silent = false) => {
     };
   };
 
-  const getRecentActivities = () => {
+const getRecentActivities = () => {
     return activities
       .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
       .slice(0, 5);
