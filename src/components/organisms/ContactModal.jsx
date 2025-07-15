@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "react-toastify";
+import { format } from "date-fns";
 import { cn } from "@/utils/cn";
+import ApperIcon from "@/components/ApperIcon";
+import Badge from "@/components/atoms/Badge";
 import Button from "@/components/atoms/Button";
 import FormField from "@/components/molecules/FormField";
-import ApperIcon from "@/components/ApperIcon";
 import { contactService } from "@/services/api/contactService";
 
 const ContactModal = ({ 
@@ -12,6 +14,8 @@ const ContactModal = ({
   onClose,
   contact,
   onSave,
+  viewMode = false,
+  onEdit,
   className = "",
   ...props 
 }) => {
@@ -131,11 +135,11 @@ const ContactModal = ({
           exit={{ opacity: 0, scale: 0.95 }}
           transition={{ duration: 0.2 }}
           {...props}
-        >
+>
           <div className="gradient-header rounded-t-lg p-6">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold font-display">
-                {contact ? "Edit Contact" : "Add New Contact"}
+                {viewMode ? "Contact Details" : (contact ? "Edit Contact" : "Add New Contact")}
               </h2>
               <button
                 onClick={onClose}
@@ -145,85 +149,164 @@ const ContactModal = ({
               </button>
             </div>
           </div>
-          
-          <form onSubmit={handleSubmit} className="p-6 space-y-4">
-            <FormField
-              label="Name"
-              value={formData.name}
-              onChange={(e) => handleInputChange("name", e.target.value)}
-              error={errors.name}
-              required
-              placeholder="Enter contact name"
-            />
-            
-            <FormField
-              label="Email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => handleInputChange("email", e.target.value)}
-              error={errors.email}
-              required
-              placeholder="Enter email address"
-            />
-            
-            <FormField
-              label="Phone"
-              type="tel"
-              value={formData.phone}
-              onChange={(e) => handleInputChange("phone", e.target.value)}
-              error={errors.phone}
-              placeholder="Enter phone number"
-            />
-            
-            <FormField
-              label="Company"
-              value={formData.company}
-              onChange={(e) => handleInputChange("company", e.target.value)}
-              error={errors.company}
-              required
-              placeholder="Enter company name"
-            />
-            
-            <FormField
-              label="Status"
-              type="select"
-              value={formData.status}
-              onChange={(e) => handleInputChange("status", e.target.value)}
-              options={[
-                { value: "lead", label: "Lead" },
-                { value: "active", label: "Active" },
-                { value: "inactive", label: "Inactive" }
-              ]}
-              required
-            />
-            
-            <FormField
-              label="Tags"
-              value={formData.tags}
-              onChange={(e) => handleInputChange("tags", e.target.value)}
-              placeholder="Enter tags separated by commas"
-            />
-            
-            <div className="flex space-x-3 pt-4">
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={onClose}
-                className="flex-1"
-                disabled={loading}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                variant="primary"
-                className="flex-1"
-                loading={loading}
-              >
-                {contact ? "Update" : "Create"}
-              </Button>
+          {viewMode ? (
+            <div className="p-6 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                  <p className="text-gray-900 font-medium">{contact?.name || "-"}</p>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                  <div>
+                    <Badge 
+                      variant={contact?.status === 'active' ? 'success' : contact?.status === 'inactive' ? 'warning' : 'primary'}
+                      size="sm"
+                    >
+                      {contact?.status || 'lead'}
+                    </Badge>
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <p className="text-gray-900">{contact?.email || "-"}</p>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                  <p className="text-gray-900">{contact?.phone || "-"}</p>
+                </div>
+                
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Company</label>
+                  <p className="text-gray-900">{contact?.company || "-"}</p>
+                </div>
+                
+                {contact?.tags && contact.tags.length > 0 && (
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Tags</label>
+                    <div className="flex flex-wrap gap-1">
+                      {contact.tags.map((tag, index) => (
+                        <Badge key={index} variant="default" size="sm">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {contact?.lastContacted && (
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Last Contacted</label>
+                    <p className="text-gray-900">{format(new Date(contact.lastContacted), "MMM dd, yyyy 'at' h:mm a")}</p>
+                  </div>
+                )}
+              </div>
+              
+              <div className="flex space-x-3 pt-4 border-t border-gray-200">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={onClose}
+                  className="flex-1"
+                >
+                  Close
+                </Button>
+                {onEdit && (
+                  <Button
+                    type="button"
+                    variant="primary"
+                    onClick={() => onEdit(contact)}
+                    className="flex-1"
+                    icon="Edit"
+                  >
+                    Edit Contact
+                  </Button>
+                )}
+              </div>
             </div>
-          </form>
+          ) : (
+            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              <FormField
+                label="Name"
+                value={formData.name}
+                onChange={(e) => handleInputChange("name", e.target.value)}
+                error={errors.name}
+                required
+                placeholder="Enter contact name"
+              />
+              
+              <FormField
+                label="Email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => handleInputChange("email", e.target.value)}
+                error={errors.email}
+                required
+                placeholder="Enter email address"
+              />
+              
+              <FormField
+                label="Phone"
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => handleInputChange("phone", e.target.value)}
+                error={errors.phone}
+                placeholder="Enter phone number"
+              />
+              
+              <FormField
+                label="Company"
+                value={formData.company}
+                onChange={(e) => handleInputChange("company", e.target.value)}
+                error={errors.company}
+                required
+                placeholder="Enter company name"
+              />
+              
+              <FormField
+                label="Status"
+                type="select"
+                value={formData.status}
+                onChange={(e) => handleInputChange("status", e.target.value)}
+                options={[
+                  { value: "lead", label: "Lead" },
+                  { value: "active", label: "Active" },
+                  { value: "inactive", label: "Inactive" }
+                ]}
+                required
+              />
+              
+              <FormField
+                label="Tags"
+                value={formData.tags}
+                onChange={(e) => handleInputChange("tags", e.target.value)}
+                placeholder="Enter tags separated by commas"
+              />
+              
+              <div className="flex space-x-3 pt-4">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={onClose}
+                  className="flex-1"
+                  disabled={loading}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  className="flex-1"
+                  loading={loading}
+                >
+                  {contact ? "Update" : "Create"}
+                </Button>
+              </div>
+            </form>
+          )}
         </motion.div>
       </div>
     </AnimatePresence>

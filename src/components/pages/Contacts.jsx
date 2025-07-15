@@ -25,11 +25,11 @@ const Contacts = () => {
     lastContacted: "",
     dealStage: ""
   });
-  const [isModalOpen, setIsModalOpen] = useState(false);
+const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState(null);
+  const [viewMode, setViewMode] = useState(false);
   const [isEmailComposerOpen, setIsEmailComposerOpen] = useState(false);
   const [selectedEmailContact, setSelectedEmailContact] = useState(null);
-  
   // Bulk selection state
   const [selectedContacts, setSelectedContacts] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
@@ -135,13 +135,15 @@ useEffect(() => {
     setSearchTerm("");
   };
 
-  const handleAddContact = () => {
+const handleAddContact = () => {
     setSelectedContact(null);
+    setViewMode(false);
     setIsModalOpen(true);
   };
 
   const handleEditContact = (contact) => {
     setSelectedContact(contact);
+    setViewMode(false);
     setIsModalOpen(true);
   };
 
@@ -159,8 +161,9 @@ useEffect(() => {
   };
 
 const handleContactClick = (contact) => {
-    // Handle contact click (could open detail modal)
-    console.log("Contact clicked:", contact);
+    setSelectedContact(contact);
+    setViewMode(true);
+    setIsModalOpen(true);
   };
 
   const handleComposeEmail = (contact) => {
@@ -423,6 +426,8 @@ const handleEmailSent = (emailData) => {
         onClose={() => setIsModalOpen(false)}
         contact={selectedContact}
         onSave={handleSaveContact}
+        viewMode={viewMode}
+        onEdit={handleEditContact}
       />
 
       {/* Email Composer */}
