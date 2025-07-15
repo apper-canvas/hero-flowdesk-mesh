@@ -19,8 +19,10 @@ const Dashboard = () => {
   const { onMenuClick } = useOutletContext();
   const dispatch = useDispatch();
   const { activities } = useSelector((state) => state.activity);
-  const [contacts, setContacts] = useState([]);
+const [contacts, setContacts] = useState([]);
   const [deals, setDeals] = useState([]);
+  const [revenue, setRevenue] = useState(0);
+  const [conversionMetrics, setConversionMetrics] = useState({ totalDeals: 0, wonDeals: 0, conversionRate: 0 });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
@@ -66,16 +68,19 @@ const loadDashboardData = async (silent = false) => {
       }
     }
     setError("");
-    
-    try {
-      const [contactsData, dealsData, activitiesData] = await Promise.all([
+try {
+      const [contactsData, dealsData, activitiesData, revenueData, conversionData] = await Promise.all([
         contactService.getAll(),
         dealService.getAll(),
-        activityService.getAll()
+        activityService.getAll(),
+        dealService.getRevenue(),
+        dealService.getConversionMetrics()
       ]);
       
       setContacts(contactsData);
       setDeals(dealsData);
+      setRevenue(revenueData);
+      setConversionMetrics(conversionData);
       dispatch(setActivities(activitiesData));
       
       if (!silent && refreshing) {
@@ -106,21 +111,16 @@ const loadDashboardData = async (silent = false) => {
     loadDashboardData(false); // Manual refresh with user feedback
   };
 
-  const getMetrics = () => {
+const getMetrics = () => {
     const totalContacts = contacts.length;
     const activeDeals = deals.filter(deal => deal.stage !== "won" && deal.stage !== "lost").length;
-    const wonDeals = deals.filter(deal => deal.stage === "won").length;
-    const totalDeals = deals.length;
-    const conversionRate = totalDeals > 0 ? ((wonDeals / totalDeals) * 100).toFixed(1) : 0;
-    const totalRevenue = deals
-      .filter(deal => deal.stage === "won")
-      .reduce((sum, deal) => sum + (deal.value || 0), 0);
-
+    
+    // Use dynamic aggregated data for revenue and conversion rate
     return {
       totalContacts,
       activeDeals,
-      conversionRate,
-      totalRevenue
+      conversionRate: conversionMetrics.conversionRate,
+      totalRevenue: revenue
     };
   };
 

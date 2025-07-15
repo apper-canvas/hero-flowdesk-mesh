@@ -207,7 +207,114 @@ class DealService {
       } else {
         console.error("Error deleting deal:", error.message);
         throw error;
+}
+    }
+  }
+
+  // Get total revenue from won deals using aggregation
+  async getRevenue() {
+    try {
+      const params = {
+        aggregators: [
+          {
+            id: "totalRevenue",
+            fields: [
+              {
+                field: { Name: "value" },
+                Function: "Sum"
+              }
+            ],
+            where: [
+              {
+                FieldName: "stage",
+                Operator: "EqualTo",
+                Values: ["won"]
+              }
+            ]
+          }
+        ]
+      };
+
+      const response = await this.apperClient.fetchRecords(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return 0;
       }
+
+      // Extract revenue from aggregator results
+      const revenueAggregator = response.aggregators?.find(agg => agg.id === "totalRevenue");
+      return revenueAggregator?.value || 0;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching revenue:", error?.response?.data?.message);
+      } else {
+        console.error("Error fetching revenue:", error.message);
+      }
+      return 0;
+    }
+  }
+
+  // Get conversion metrics using aggregation
+  async getConversionMetrics() {
+    try {
+      const params = {
+        aggregators: [
+          {
+            id: "totalDeals",
+            fields: [
+              {
+                field: { Name: "Name" },
+                Function: "Count"
+              }
+            ]
+          },
+          {
+            id: "wonDeals",
+            fields: [
+              {
+                field: { Name: "Name" },
+                Function: "Count"
+              }
+            ],
+            where: [
+              {
+                FieldName: "stage",
+                Operator: "EqualTo",
+                Values: ["won"]
+              }
+            ]
+          }
+        ]
+      };
+
+      const response = await this.apperClient.fetchRecords(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return { totalDeals: 0, wonDeals: 0, conversionRate: 0 };
+      }
+
+      // Extract metrics from aggregator results
+      const totalDealsAgg = response.aggregators?.find(agg => agg.id === "totalDeals");
+      const wonDealsAgg = response.aggregators?.find(agg => agg.id === "wonDeals");
+      
+      const totalDeals = totalDealsAgg?.value || 0;
+      const wonDeals = wonDealsAgg?.value || 0;
+      const conversionRate = totalDeals > 0 ? ((wonDeals / totalDeals) * 100) : 0;
+
+      return {
+        totalDeals,
+        wonDeals,
+        conversionRate: parseFloat(conversionRate.toFixed(1))
+      };
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching conversion metrics:", error?.response?.data?.message);
+      } else {
+        console.error("Error fetching conversion metrics:", error.message);
+      }
+      return { totalDeals: 0, wonDeals: 0, conversionRate: 0 };
     }
   }
 }
