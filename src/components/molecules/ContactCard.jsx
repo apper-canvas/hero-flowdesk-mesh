@@ -12,8 +12,10 @@ const ContactCard = ({
   onEdit,
   onDelete,
   onComposeEmail,
+  isSelected = false,
+  onSelectionChange,
   className = "",
-  ...props 
+  ...props
 }) => {
   const statusColors = {
     active: "success",
@@ -29,17 +31,36 @@ const ContactCard = ({
   const handleDelete = (e) => {
     e.stopPropagation();
     onDelete(contact);
+};
+
+  const handleSelectionChange = (e) => {
+    e.stopPropagation();
+    onSelectionChange(contact.Id, e.target.checked);
   };
 
   return (
     <motion.div
-      className={cn("card card-hover p-4 cursor-pointer", className)}
+      className={cn(
+        "card card-hover p-4 cursor-pointer transition-all duration-200",
+        isSelected && "ring-2 ring-primary-500 bg-primary-50",
+        className
+      )}
       onClick={() => onClick(contact)}
       whileHover={{ scale: 1.02 }}
       transition={{ duration: 0.2 }}
       {...props}
     >
       <div className="flex items-start justify-between">
+        {onSelectionChange && (
+          <div className="flex items-center mr-3">
+            <input
+              type="checkbox"
+              checked={isSelected}
+              onChange={handleSelectionChange}
+              className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+            />
+          </div>
+        )}
         <div className="flex items-center space-x-3 flex-1">
           <Avatar name={contact.name} size="md" />
           <div className="flex-1 min-w-0">

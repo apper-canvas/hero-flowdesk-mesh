@@ -59,8 +59,46 @@ class ContactService {
       throw new Error("Contact not found");
     }
     
-    this.contacts.splice(index, 1);
+this.contacts.splice(index, 1);
     return { success: true };
+  }
+
+  async bulkUpdate(ids, updateData) {
+    await this.delay();
+    const updatedContacts = [];
+    
+    for (const id of ids) {
+      const index = this.contacts.findIndex(c => c.Id === parseInt(id));
+      if (index !== -1) {
+        const updatedContact = {
+          ...this.contacts[index],
+          ...updateData,
+          Id: parseInt(id)
+        };
+        this.contacts[index] = updatedContact;
+        updatedContacts.push({ ...updatedContact });
+      }
+    }
+    
+    return updatedContacts;
+  }
+
+  async bulkDelete(ids) {
+    await this.delay();
+    const deletedIds = [];
+    
+    // Sort IDs in descending order to maintain array indices during deletion
+    const sortedIds = ids.map(id => parseInt(id)).sort((a, b) => b - a);
+    
+    for (const id of sortedIds) {
+      const index = this.contacts.findIndex(c => c.Id === id);
+      if (index !== -1) {
+        this.contacts.splice(index, 1);
+        deletedIds.push(id);
+      }
+    }
+    
+    return { success: true, deletedIds };
   }
 }
 
