@@ -19,11 +19,10 @@ const Contacts = () => {
   const [filteredContacts, setFilteredContacts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
+const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
     status: "",
-    lastContacted: "",
-    dealStage: ""
+    lastContacted: ""
   });
 const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState(null);
@@ -126,11 +125,10 @@ useEffect(() => {
     }));
   };
 
-  const handleClearFilters = () => {
+const handleClearFilters = () => {
     setFilters({
       status: "",
-      lastContacted: "",
-      dealStage: ""
+      lastContacted: ""
     });
     setSearchTerm("");
   };

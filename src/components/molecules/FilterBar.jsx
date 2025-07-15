@@ -43,22 +43,7 @@ const FilterBar = ({
           { value: "older", label: "Older" }
         ]}
         className="w-36"
-      />
-      
-      <Select
-        placeholder="Deal Stage"
-        value={filters.dealStage || ""}
-        onChange={(e) => onFilterChange("dealStage", e.target.value)}
-        options={[
-          { value: "lead", label: "Lead" },
-          { value: "qualified", label: "Qualified" },
-          { value: "proposal", label: "Proposal" },
-          { value: "won", label: "Won" },
-          { value: "lost", label: "Lost" }
-        ]}
-        className="w-32"
-      />
-      
+/>
       {hasActiveFilters && (
         <Button
           variant="ghost"
