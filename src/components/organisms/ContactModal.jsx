@@ -103,9 +103,13 @@ const handleSubmit = async (e) => {
     setLoading(true);
     
     try {
-      const contactData = {
-        ...formData,
-        tags: formData.tags.split(",").map(tag => tag.trim()).filter(Boolean)
+const contactData = {
+        Name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        company: formData.company,
+        status: formData.status,
+        Tags: formData.tags.split(",").map(tag => tag.trim()).filter(Boolean)
       };
       
       let savedContact;
