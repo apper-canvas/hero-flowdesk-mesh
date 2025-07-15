@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import Header from "@/components/organisms/Header";
 import ContactCard from "@/components/molecules/ContactCard";
 import ContactModal from "@/components/organisms/ContactModal";
+import EmailComposer from "@/components/organisms/EmailComposer";
 import FilterBar from "@/components/molecules/FilterBar";
 import Loading from "@/components/ui/Loading";
 import Error from "@/components/ui/Error";
@@ -24,8 +25,10 @@ const Contacts = () => {
     lastContacted: "",
     dealStage: ""
   });
-  const [isModalOpen, setIsModalOpen] = useState(false);
+const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState(null);
+  const [isEmailComposerOpen, setIsEmailComposerOpen] = useState(false);
+  const [selectedEmailContact, setSelectedEmailContact] = useState(null);
 
   useEffect(() => {
     loadContacts();
@@ -140,11 +143,21 @@ const Contacts = () => {
     }
   };
 
-  const handleContactClick = (contact) => {
+const handleContactClick = (contact) => {
     // Handle contact click (could open detail modal)
     console.log("Contact clicked:", contact);
   };
 
+  const handleComposeEmail = (contact) => {
+    setSelectedEmailContact(contact);
+    setIsEmailComposerOpen(true);
+  };
+
+  const handleEmailSent = (emailData) => {
+    // Log email activity
+    console.log("Email sent:", emailData);
+    toast.success(`Email sent to ${emailData.to}`);
+  };
   const handleSaveContact = (savedContact) => {
     if (selectedContact) {
       // Update existing contact
@@ -241,11 +254,12 @@ const Contacts = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.05 }}
                 >
-                  <ContactCard
+<ContactCard
                     contact={contact}
                     onClick={handleContactClick}
                     onEdit={handleEditContact}
                     onDelete={handleDeleteContact}
+                    onComposeEmail={handleComposeEmail}
                   />
                 </motion.div>
               ))}
@@ -254,12 +268,20 @@ const Contacts = () => {
         </div>
       </div>
 
-      {/* Contact Modal */}
+{/* Contact Modal */}
       <ContactModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         contact={selectedContact}
         onSave={handleSaveContact}
+      />
+
+      {/* Email Composer */}
+      <EmailComposer
+        isOpen={isEmailComposerOpen}
+        onClose={() => setIsEmailComposerOpen(false)}
+        contact={selectedEmailContact}
+        onSent={handleEmailSent}
       />
     </div>
   );

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import { motion } from "framer-motion";
+import { toast } from "react-toastify";
 import Header from "@/components/organisms/Header";
 import PipelineBoard from "@/components/organisms/PipelineBoard";
 import DealModal from "@/components/organisms/DealModal";
+import EmailComposer from "@/components/organisms/EmailComposer";
 import Loading from "@/components/ui/Loading";
 import Error from "@/components/ui/Error";
 import Button from "@/components/atoms/Button";
@@ -13,9 +15,11 @@ const Deals = () => {
   const { onMenuClick } = useOutletContext();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
+const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDeal, setSelectedDeal] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [isEmailComposerOpen, setIsEmailComposerOpen] = useState(false);
+  const [selectedEmailDeal, setSelectedEmailDeal] = useState(null);
 
   const handleAddDeal = () => {
     setSelectedDeal(null);
@@ -32,9 +36,20 @@ const Deals = () => {
     setRefreshKey(prev => prev + 1);
   };
 
-  const handleSaveDeal = (savedDeal) => {
+const handleSaveDeal = (savedDeal) => {
     // Refresh the pipeline board
     setRefreshKey(prev => prev + 1);
+  };
+
+  const handleComposeEmail = (deal) => {
+    setSelectedEmailDeal(deal);
+    setIsEmailComposerOpen(true);
+  };
+
+  const handleEmailSent = (emailData) => {
+    // Log email activity
+    console.log("Email sent:", emailData);
+    toast.success(`Email sent to ${emailData.to}`);
   };
 
   if (loading) {
@@ -93,21 +108,30 @@ const Deals = () => {
             transition={{ duration: 0.3 }}
             className="h-full"
           >
-            <PipelineBoard
+<PipelineBoard
               onEditDeal={handleEditDeal}
               onDeleteDeal={handleDeleteDeal}
+              onComposeEmail={handleComposeEmail}
               className="h-full"
             />
           </motion.div>
         </div>
       </div>
 
-      {/* Deal Modal */}
+{/* Deal Modal */}
       <DealModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         deal={selectedDeal}
         onSave={handleSaveDeal}
+      />
+
+      {/* Email Composer */}
+      <EmailComposer
+        isOpen={isEmailComposerOpen}
+        onClose={() => setIsEmailComposerOpen(false)}
+        deal={selectedEmailDeal}
+        onSent={handleEmailSent}
       />
     </div>
   );

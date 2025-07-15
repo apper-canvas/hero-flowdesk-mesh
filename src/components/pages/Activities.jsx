@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import { motion } from "framer-motion";
+import { toast } from "react-toastify";
 import Header from "@/components/organisms/Header";
 import ActivityItem from "@/components/molecules/ActivityItem";
+import EmailComposer from "@/components/organisms/EmailComposer";
 import Loading from "@/components/ui/Loading";
 import Error from "@/components/ui/Error";
 import Empty from "@/components/ui/Empty";
@@ -20,8 +22,11 @@ const Activities = () => {
   const [filteredActivities, setFilteredActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
+const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
+  const [isEmailComposerOpen, setIsEmailComposerOpen] = useState(false);
+  const [selectedEmailContact, setSelectedEmailContact] = useState(null);
+  const [selectedEmailDeal, setSelectedEmailDeal] = useState(null);
 
   useEffect(() => {
     loadActivities();
@@ -96,6 +101,20 @@ const Activities = () => {
     return deals.find(deal => deal.Id === parseInt(dealId));
   };
 
+const handleComposeEmail = (contact = null, deal = null) => {
+    setSelectedEmailContact(contact);
+    setSelectedEmailDeal(deal);
+    setIsEmailComposerOpen(true);
+  };
+
+  const handleEmailSent = (emailData) => {
+    // Log email activity
+    console.log("Email sent:", emailData);
+    toast.success(`Email sent to ${emailData.to}`);
+    // Refresh activities to show the new email activity
+    loadActivities();
+  };
+
   const activityTypes = [
     { value: "call", label: "Call" },
     { value: "email", label: "Email" },
@@ -138,12 +157,21 @@ const Activities = () => {
 
   return (
     <div className="flex flex-col h-full">
-      <Header
+<Header
         title="Activities"
         subtitle="Track interactions and tasks"
         searchValue={searchTerm}
         onSearchChange={handleSearchChange}
         onMenuClick={onMenuClick}
+        actions={
+          <Button
+            variant="primary"
+            icon="Mail"
+            onClick={() => handleComposeEmail()}
+          >
+            Compose Email
+          </Button>
+        }
       />
       
       <div className="flex-1 p-6 overflow-y-auto">
@@ -205,9 +233,18 @@ const Activities = () => {
                 </motion.div>
               ))}
             </motion.div>
-          )}
+)}
         </div>
       </div>
+
+      {/* Email Composer */}
+      <EmailComposer
+        isOpen={isEmailComposerOpen}
+        onClose={() => setIsEmailComposerOpen(false)}
+        contact={selectedEmailContact}
+        deal={selectedEmailDeal}
+        onSent={handleEmailSent}
+      />
     </div>
   );
 };

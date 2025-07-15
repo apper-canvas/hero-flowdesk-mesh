@@ -1,0 +1,50 @@
+[
+  {
+    "Id": 1,
+    "name": "Follow-up Template",
+    "description": "Professional follow-up email for initial contact",
+    "category": "follow-up",
+    "subject": "Following up on our conversation - {contact.name}",
+    "body": "Hi {contact.name},\n\nI hope this email finds you well. I wanted to follow up on our recent conversation about {deal.title}.\n\nI believe our solution could be a great fit for {contact.company}, and I'd love to discuss how we can help you achieve your goals.\n\nWould you be available for a brief call this week to explore this further?\n\nBest regards,\n{user.name}"
+  },
+  {
+    "Id": 2,
+    "name": "Proposal Template",
+    "description": "Professional proposal email with deal details",
+    "category": "proposal",
+    "subject": "Proposal for {deal.title} - {contact.company}",
+    "body": "Dear {contact.name},\n\nThank you for your interest in our services. I'm pleased to provide you with a proposal for {deal.title}.\n\nBased on our discussion, I understand that {contact.company} is looking for a solution that can help streamline your operations and drive growth.\n\nOur proposed solution includes:\n- Comprehensive analysis of your current processes\n- Customized implementation plan\n- Ongoing support and maintenance\n\nThe total investment for this project would be {deal.value}.\n\nI'd be happy to schedule a meeting to discuss this proposal in detail and answer any questions you may have.\n\nLooking forward to hearing from you.\n\nBest regards,\n{user.name}"
+  },
+  {
+    "Id": 3,
+    "name": "Thank You Template",
+    "description": "Thank you email after meeting or call",
+    "category": "thank-you",
+    "subject": "Thank you for your time - {contact.name}",
+    "body": "Hi {contact.name},\n\nThank you for taking the time to speak with me today about {deal.title}. I really enjoyed our conversation and learning more about {contact.company}'s goals and challenges.\n\nAs discussed, I'll be sending over the additional information you requested by tomorrow. In the meantime, please don't hesitate to reach out if you have any questions.\n\nI look forward to continuing our conversation and exploring how we can work together.\n\nBest regards,\n{user.name}"
+  },
+  {
+    "Id": 4,
+    "name": "Check-in Template",
+    "description": "Regular check-in email for existing contacts",
+    "category": "check-in",
+    "subject": "Quick check-in - {contact.name}",
+    "body": "Hi {contact.name},\n\nI hope you're doing well! I wanted to check in and see how things are going at {contact.company}.\n\nIt's been a while since we last spoke, and I'd love to hear about any new developments or challenges you might be facing.\n\nIf there's anything I can help you with or if you'd like to explore new opportunities for collaboration, please let me know.\n\nLooking forward to hearing from you.\n\nBest regards,\n{user.name}"
+  },
+  {
+    "Id": 5,
+    "name": "Meeting Request Template",
+    "description": "Professional meeting request email",
+    "category": "meeting",
+    "subject": "Meeting Request - {deal.title}",
+    "body": "Hi {contact.name},\n\nI hope this email finds you well. I would like to schedule a meeting to discuss {deal.title} in more detail.\n\nDuring our meeting, we can:\n- Review your current requirements\n- Discuss potential solutions\n- Address any questions or concerns\n- Outline next steps\n\nI'm available for a meeting at your convenience. Please let me know what days and times work best for you, and I'll send over a calendar invitation.\n\nThank you for your time, and I look forward to our discussion.\n\nBest regards,\n{user.name}"
+  },
+  {
+    "Id": 6,
+    "name": "Quote Request Template",
+    "description": "Template for requesting quotes or pricing information",
+    "category": "quote",
+    "subject": "Quote Request - {deal.title}",
+    "body": "Dear {contact.name},\n\nThank you for your interest in our services for {deal.title}. I'm excited about the opportunity to work with {contact.company}.\n\nTo provide you with an accurate quote, I'd like to gather some additional information about your specific requirements:\n\n- Project timeline and key milestones\n- Budget range and constraints\n- Technical specifications or preferences\n- Success criteria and expected outcomes\n\nWould you be available for a brief call this week to discuss these details? This will help me prepare a comprehensive proposal that meets your needs.\n\nI look forward to hearing from you soon.\n\nBest regards,\n{user.name}"
+  }
+]
