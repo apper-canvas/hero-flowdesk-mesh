@@ -1,15 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { motion } from "framer-motion";
+import { toast } from "react-hot-toast";
 import Header from "@/components/organisms/Header";
+import Button from "@/components/ui/Button";
+import Empty from "@/components/ui/Empty";
+import Error from "@/components/ui/Error";
+import Loading from "@/components/ui/Loading";
+import Activities from "@/components/pages/Activities";
 import MetricCard from "@/components/molecules/MetricCard";
 import ActivityItem from "@/components/molecules/ActivityItem";
-import Loading from "@/components/ui/Loading";
-import Error from "@/components/ui/Error";
-import Empty from "@/components/ui/Empty";
 import { contactService } from "@/services/api/contactService";
-import { dealService } from "@/services/api/dealService";
 import { activityService } from "@/services/api/activityService";
+import { dealService } from "@/services/api/dealService";
 
 const Dashboard = () => {
   const { onMenuClick } = useOutletContext();
@@ -17,14 +20,41 @@ const Dashboard = () => {
   const [deals, setDeals] = useState([]);
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
+
+  // Auto-refresh interval
+  const AUTO_REFRESH_INTERVAL = 30000; // 30 seconds
 
   useEffect(() => {
     loadDashboardData();
+    
+    // Listen for data change events from other components
+    const handleDataChange = () => {
+      loadDashboardData(true); // Silent refresh
+    };
+    
+    window.addEventListener('dataChanged', handleDataChange);
+    
+    // Set up auto-refresh interval
+    const intervalId = setInterval(() => {
+      loadDashboardData(true); // Silent background refresh
+    }, AUTO_REFRESH_INTERVAL);
+    
+    return () => {
+      window.removeEventListener('dataChanged', handleDataChange);
+      clearInterval(intervalId);
+    };
   }, []);
-
-  const loadDashboardData = async () => {
-    setLoading(true);
+const loadDashboardData = async (silent = false) => {
+    // Use refreshing state for manual refresh, loading for initial load
+    if (!silent) {
+      if (contacts.length > 0) {
+        setRefreshing(true);
+      } else {
+        setLoading(true);
+      }
+    }
     setError("");
     
     try {
@@ -37,12 +67,24 @@ const Dashboard = () => {
       setContacts(contactsData);
       setDeals(dealsData);
       setActivities(activitiesData);
+      
+      if (!silent && refreshing) {
+        toast.success("Dashboard data refreshed");
+      }
     } catch (err) {
       console.error("Error loading dashboard data:", err);
       setError("Failed to load dashboard data");
+      if (!silent) {
+        toast.error("Failed to refresh dashboard data");
+      }
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
+  };
+
+  const handleManualRefresh = () => {
+    loadDashboardData(false); // Manual refresh with user feedback
   };
 
   const getMetrics = () => {
@@ -110,12 +152,23 @@ const Dashboard = () => {
   const metrics = getMetrics();
   const recentActivities = getRecentActivities();
 
-  return (
+return (
     <div className="flex flex-col h-full">
       <Header
         title="Dashboard"
         subtitle="Welcome back! Here's your CRM overview"
         onMenuClick={onMenuClick}
+        actions={
+          <Button
+            variant="secondary"
+            icon="RefreshCw"
+            onClick={handleManualRefresh}
+            disabled={refreshing}
+            className={refreshing ? "animate-spin" : ""}
+          >
+            {refreshing ? "Refreshing..." : "Refresh"}
+          </Button>
+        }
       />
       
       <div className="flex-1 p-6 overflow-y-auto">
