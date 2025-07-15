@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { useOutletContext } from "react-router-dom";
-import { motion } from "framer-motion";
-import { toast } from "react-hot-toast";
-import Header from "@/components/organisms/Header";
-import Button from "@/components/ui/Button";
-import Empty from "@/components/ui/Empty";
-import Error from "@/components/ui/Error";
-import Loading from "@/components/ui/Loading";
-import Activities from "@/components/pages/Activities";
-import MetricCard from "@/components/molecules/MetricCard";
+import React, { useEffect, useState } from 'react'
+import { useOutletContext } from 'react-router-dom'
+import { motion } from 'framer-motion'
+import { toast } from 'react-toastify'
+import Header from '@/components/organisms/Header'
+import Button from '@/components/ui/Button'
+import Empty from '@/components/ui/Empty'
+import Error from '@/components/ui/Error'
+import Loading from '@/components/ui/Loading'
+import Activities from '@/components/pages/Activities'
+import MetricCard from '@/components/molecules/MetricCard'
 import ActivityItem from "@/components/molecules/ActivityItem";
 import { contactService } from "@/services/api/contactService";
 import { activityService } from "@/services/api/activityService";
