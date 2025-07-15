@@ -1,12 +1,12 @@
 class DealService {
   constructor() {
-    // Initialize ApperClient for database operations
-    const { ApperClient } = window.ApperSDK;
+    // Initialize ApperClient
+    const { ApperClient } = window.ApperSDK
     this.apperClient = new ApperClient({
       apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
       apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
-    });
-    this.tableName = 'deal';
+    })
+    this.tableName = 'deal'
   }
 
   async getAll() {
@@ -17,35 +17,44 @@ class DealService {
           { field: { Name: "title" } },
           { field: { Name: "value" } },
           { field: { Name: "stage" } },
-          { field: { Name: "contact_id" } },
           { field: { Name: "probability" } },
           { field: { Name: "expected_close" } },
-          { field: { Name: "created_at" } }
+          { field: { Name: "Tags" } },
+          { field: { Name: "created_at" } },
+          { field: { Name: "CreatedOn" } },
+          { field: { Name: "ModifiedOn" } },
+          { 
+            field: { Name: "Owner" },
+            referenceField: { field: { Name: "Name" } }
+          },
+          { 
+            field: { Name: "contact_id" },
+            referenceField: { field: { Name: "Name" } }
+          }
         ],
         orderBy: [
           {
-            fieldName: "created_at",
+            fieldName: "CreatedOn",
             sorttype: "DESC"
           }
         ]
-      };
-
-      const response = await this.apperClient.fetchRecords(this.tableName, params);
+      }
+      
+      const response = await this.apperClient.fetchRecords(this.tableName, params)
       
       if (!response.success) {
-        console.error(response.message);
-        throw new Error(response.message);
+        console.error(response.message)
+        return []
       }
-
-      return response.data || [];
+      
+      return response.data || []
     } catch (error) {
       if (error?.response?.data?.message) {
-        console.error("Error fetching deals:", error?.response?.data?.message);
-        throw new Error(error.response.data.message);
+        console.error("Error fetching deals:", error?.response?.data?.message)
       } else {
-        console.error("Error fetching deals:", error.message);
-        throw error;
+        console.error(error.message)
       }
+      return []
     }
   }
 
@@ -57,33 +66,42 @@ class DealService {
           { field: { Name: "title" } },
           { field: { Name: "value" } },
           { field: { Name: "stage" } },
-          { field: { Name: "contact_id" } },
           { field: { Name: "probability" } },
           { field: { Name: "expected_close" } },
-          { field: { Name: "created_at" } }
+          { field: { Name: "Tags" } },
+          { field: { Name: "created_at" } },
+          { field: { Name: "CreatedOn" } },
+          { field: { Name: "ModifiedOn" } },
+          { 
+            field: { Name: "Owner" },
+            referenceField: { field: { Name: "Name" } }
+          },
+          { 
+            field: { Name: "contact_id" },
+            referenceField: { field: { Name: "Name" } }
+          }
         ]
-      };
-
-      const response = await this.apperClient.getRecordById(this.tableName, parseInt(id), params);
+      }
+      
+      const response = await this.apperClient.getRecordById(this.tableName, id, params)
       
       if (!response.success) {
-        console.error(response.message);
-        throw new Error(response.message);
+        console.error(response.message)
+        return null
       }
-
-      return response.data;
+      
+      return response.data
     } catch (error) {
       if (error?.response?.data?.message) {
-        console.error(`Error fetching deal with ID ${id}:`, error?.response?.data?.message);
-        throw new Error(error.response.data.message);
+        console.error(`Error fetching deal with ID ${id}:`, error?.response?.data?.message)
       } else {
-        console.error(`Error fetching deal with ID ${id}:`, error.message);
-        throw error;
+        console.error(error.message)
       }
+      return null
     }
   }
 
-  async create(dealData) {
+async create(dealData) {
     try {
       // Filter to include only Updateable fields
       const filteredData = {
@@ -93,8 +111,7 @@ class DealService {
         stage: dealData.stage,
         contact_id: parseInt(dealData.contactId || dealData.contact_id),
         probability: parseFloat(dealData.probability),
-        expected_close: dealData.expectedClose || dealData.expected_close,
-        created_at: new Date().toISOString()
+        expected_close: dealData.expectedClose || dealData.expected_close
       };
 
       const params = {
@@ -207,7 +224,45 @@ class DealService {
       } else {
         console.error("Error deleting deal:", error.message);
         throw error;
-}
+      }
+    }
+  }
+
+  async updateStage(id, stage) {
+    try {
+      const params = {
+        records: [{
+          Id: parseInt(id),
+          stage: stage
+        }]
+      };
+      
+      const response = await this.apperClient.updateRecord(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+      
+      if (response.results) {
+        const successfulUpdates = response.results.filter(result => result.success);
+        const failedUpdates = response.results.filter(result => !result.success);
+        
+        if (failedUpdates.length > 0) {
+          console.error(`Failed to update ${failedUpdates.length} records:${JSON.stringify(failedUpdates)}`);
+          throw new Error(failedUpdates[0].message || 'Failed to update deal stage');
+        }
+        
+        return successfulUpdates[0]?.data;
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error updating deal stage:", error?.response?.data?.message);
+        throw new Error(error.response.data.message);
+      } else {
+        console.error("Error updating deal stage:", error.message);
+        throw error;
+      }
     }
   }
 

@@ -1,12 +1,12 @@
 class ContactService {
   constructor() {
-    // Initialize ApperClient for database operations
-    const { ApperClient } = window.ApperSDK;
+    // Initialize ApperClient
+    const { ApperClient } = window.ApperSDK
     this.apperClient = new ApperClient({
       apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
       apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
-    });
-    this.tableName = 'app_contact';
+    })
+    this.tableName = 'app_contact'
   }
 
   async getAll() {
@@ -20,32 +20,37 @@ class ContactService {
           { field: { Name: "status" } },
           { field: { Name: "Tags" } },
           { field: { Name: "last_contacted" } },
-          { field: { Name: "created_at" } }
+          { field: { Name: "created_at" } },
+          { field: { Name: "CreatedOn" } },
+          { field: { Name: "ModifiedOn" } },
+          { 
+            field: { Name: "Owner" },
+            referenceField: { field: { Name: "Name" } }
+          }
         ],
         orderBy: [
           {
-            fieldName: "created_at",
+            fieldName: "CreatedOn",
             sorttype: "DESC"
           }
         ]
-      };
-
-      const response = await this.apperClient.fetchRecords(this.tableName, params);
+      }
+      
+      const response = await this.apperClient.fetchRecords(this.tableName, params)
       
       if (!response.success) {
-        console.error(response.message);
-        throw new Error(response.message);
+        console.error(response.message)
+        return []
       }
-
-      return response.data || [];
+      
+      return response.data || []
     } catch (error) {
       if (error?.response?.data?.message) {
-        console.error("Error fetching contacts:", error?.response?.data?.message);
-        throw new Error(error.response.data.message);
+        console.error("Error fetching contacts:", error?.response?.data?.message)
       } else {
-        console.error("Error fetching contacts:", error.message);
-        throw error;
+        console.error(error.message)
       }
+      return []
     }
   }
 
@@ -60,226 +65,232 @@ class ContactService {
           { field: { Name: "status" } },
           { field: { Name: "Tags" } },
           { field: { Name: "last_contacted" } },
-          { field: { Name: "created_at" } }
+          { field: { Name: "created_at" } },
+          { field: { Name: "CreatedOn" } },
+          { field: { Name: "ModifiedOn" } },
+          { 
+            field: { Name: "Owner" },
+            referenceField: { field: { Name: "Name" } }
+          }
         ]
-      };
-
-      const response = await this.apperClient.getRecordById(this.tableName, parseInt(id), params);
+      }
+      
+      const response = await this.apperClient.getRecordById(this.tableName, id, params)
       
       if (!response.success) {
-        console.error(response.message);
-        throw new Error(response.message);
+        console.error(response.message)
+        return null
       }
-
-      return response.data;
+      
+      return response.data
     } catch (error) {
       if (error?.response?.data?.message) {
-        console.error(`Error fetching contact with ID ${id}:`, error?.response?.data?.message);
-        throw new Error(error.response.data.message);
+        console.error(`Error fetching contact with ID ${id}:`, error?.response?.data?.message)
       } else {
-        console.error(`Error fetching contact with ID ${id}:`, error.message);
-        throw error;
+        console.error(error.message)
       }
+      return null
     }
   }
 
   async create(contactData) {
     try {
-      // Filter to include only Updateable fields
-      const filteredData = {
-        Name: contactData.name || contactData.Name,
-        email: contactData.email,
-        phone: contactData.phone,
-        company: contactData.company,
-        status: contactData.status,
-        Tags: Array.isArray(contactData.tags) ? contactData.tags.join(',') : (contactData.Tags || ''),
-        last_contacted: contactData.lastContacted || contactData.last_contacted,
-        created_at: new Date().toISOString()
-      };
-
+      // Only include Updateable fields
       const params = {
-        records: [filteredData]
-      };
-
-      const response = await this.apperClient.createRecord(this.tableName, params);
+        records: [{
+          Name: contactData.Name,
+          email: contactData.email,
+          phone: contactData.phone,
+          company: contactData.company,
+          status: contactData.status,
+          Tags: contactData.Tags,
+          last_contacted: contactData.last_contacted,
+          created_at: contactData.created_at || new Date().toISOString(),
+          Owner: contactData.Owner
+        }]
+      }
+      
+      const response = await this.apperClient.createRecord(this.tableName, params)
       
       if (!response.success) {
-        console.error(response.message);
-        throw new Error(response.message);
+        console.error(response.message)
+        return null
       }
-
+      
       if (response.results) {
-        const successfulRecords = response.results.filter(result => result.success);
-        const failedRecords = response.results.filter(result => !result.success);
+        const successfulRecords = response.results.filter(result => result.success)
+        const failedRecords = response.results.filter(result => !result.success)
         
         if (failedRecords.length > 0) {
-          console.error(`Failed to create ${failedRecords.length} records:${JSON.stringify(failedRecords)}`);
-          throw new Error(failedRecords[0].message || 'Failed to create contact');
+          console.error(`Failed to create ${failedRecords.length} records:${JSON.stringify(failedRecords)}`)
         }
         
-        return successfulRecords[0]?.data;
+        return successfulRecords.length > 0 ? successfulRecords[0].data : null
       }
+      
+      return null
     } catch (error) {
       if (error?.response?.data?.message) {
-        console.error("Error creating contact:", error?.response?.data?.message);
-        throw new Error(error.response.data.message);
+        console.error("Error creating contact:", error?.response?.data?.message)
       } else {
-        console.error("Error creating contact:", error.message);
-        throw error;
+        console.error(error.message)
       }
+      return null
     }
   }
 
   async update(id, contactData) {
     try {
-      // Filter to include only Updateable fields
-      const filteredData = {
-        Id: parseInt(id),
-        Name: contactData.name || contactData.Name,
-        email: contactData.email,
-        phone: contactData.phone,
-        company: contactData.company,
-        status: contactData.status,
-        Tags: Array.isArray(contactData.tags) ? contactData.tags.join(',') : (contactData.Tags || ''),
-        last_contacted: contactData.lastContacted || contactData.last_contacted
-      };
-
+      // Only include Updateable fields
       const params = {
-        records: [filteredData]
-      };
-
-      const response = await this.apperClient.updateRecord(this.tableName, params);
+        records: [{
+          Id: id,
+          Name: contactData.Name,
+          email: contactData.email,
+          phone: contactData.phone,
+          company: contactData.company,
+          status: contactData.status,
+          Tags: contactData.Tags,
+          last_contacted: contactData.last_contacted,
+          created_at: contactData.created_at,
+          Owner: contactData.Owner
+        }]
+      }
+      
+      const response = await this.apperClient.updateRecord(this.tableName, params)
       
       if (!response.success) {
-        console.error(response.message);
-        throw new Error(response.message);
+        console.error(response.message)
+        return null
       }
-
+      
       if (response.results) {
-        const successfulRecords = response.results.filter(result => result.success);
-        const failedRecords = response.results.filter(result => !result.success);
+        const successfulUpdates = response.results.filter(result => result.success)
+        const failedUpdates = response.results.filter(result => !result.success)
         
-        if (failedRecords.length > 0) {
-          console.error(`Failed to update ${failedRecords.length} records:${JSON.stringify(failedRecords)}`);
-          throw new Error(failedRecords[0].message || 'Failed to update contact');
+        if (failedUpdates.length > 0) {
+          console.error(`Failed to update ${failedUpdates.length} records:${JSON.stringify(failedUpdates)}`)
         }
         
-        return successfulRecords[0]?.data;
+        return successfulUpdates.length > 0 ? successfulUpdates[0].data : null
       }
+      
+      return null
     } catch (error) {
       if (error?.response?.data?.message) {
-        console.error("Error updating contact:", error?.response?.data?.message);
-        throw new Error(error.response.data.message);
+        console.error("Error updating contact:", error?.response?.data?.message)
       } else {
-        console.error("Error updating contact:", error.message);
-        throw error;
+        console.error(error.message)
       }
+      return null
     }
   }
 
   async delete(id) {
     try {
       const params = {
-        RecordIds: [parseInt(id)]
-      };
-
-      const response = await this.apperClient.deleteRecord(this.tableName, params);
+        RecordIds: [id]
+      }
+      
+      const response = await this.apperClient.deleteRecord(this.tableName, params)
       
       if (!response.success) {
-        console.error(response.message);
-        throw new Error(response.message);
+        console.error(response.message)
+        return false
       }
-
+      
       if (response.results) {
-        const failedRecords = response.results.filter(result => !result.success);
+        const successfulDeletions = response.results.filter(result => result.success)
+        const failedDeletions = response.results.filter(result => !result.success)
         
-        if (failedRecords.length > 0) {
-          console.error(`Failed to delete ${failedRecords.length} records:${JSON.stringify(failedRecords)}`);
-          throw new Error(failedRecords[0].message || 'Failed to delete contact');
+        if (failedDeletions.length > 0) {
+          console.error(`Failed to delete ${failedDeletions.length} records:${JSON.stringify(failedDeletions)}`)
         }
+        
+        return successfulDeletions.length > 0
       }
-
-      return { success: true };
+      
+      return false
     } catch (error) {
       if (error?.response?.data?.message) {
-        console.error("Error deleting contact:", error?.response?.data?.message);
-        throw new Error(error.response.data.message);
+        console.error("Error deleting contact:", error?.response?.data?.message)
       } else {
-        console.error("Error deleting contact:", error.message);
-        throw error;
+        console.error(error.message)
       }
+      return false
     }
   }
 
   async bulkUpdate(ids, updateData) {
     try {
       const records = ids.map(id => ({
-        Id: parseInt(id),
+        Id: id,
         ...updateData
-      }));
-
-      const params = { records };
-
-      const response = await this.apperClient.updateRecord(this.tableName, params);
+      }))
+      
+      const params = { records }
+      
+      const response = await this.apperClient.updateRecord(this.tableName, params)
       
       if (!response.success) {
-        console.error(response.message);
-        throw new Error(response.message);
+        console.error(response.message)
+        return []
       }
-
+      
       if (response.results) {
-        const successfulRecords = response.results.filter(result => result.success);
-        const failedRecords = response.results.filter(result => !result.success);
+        const successfulUpdates = response.results.filter(result => result.success)
+        const failedUpdates = response.results.filter(result => !result.success)
         
-        if (failedRecords.length > 0) {
-          console.error(`Failed to update ${failedRecords.length} records:${JSON.stringify(failedRecords)}`);
+        if (failedUpdates.length > 0) {
+          console.error(`Failed to update ${failedUpdates.length} records:${JSON.stringify(failedUpdates)}`)
         }
         
-        return successfulRecords.map(result => result.data);
+        return successfulUpdates.map(result => result.data)
       }
-
-      return [];
+      
+      return []
     } catch (error) {
       if (error?.response?.data?.message) {
-        console.error("Error bulk updating contacts:", error?.response?.data?.message);
-        throw new Error(error.response.data.message);
+        console.error("Error bulk updating contacts:", error?.response?.data?.message)
       } else {
-        console.error("Error bulk updating contacts:", error.message);
-        throw error;
+        console.error(error.message)
       }
+      return []
     }
   }
 
   async bulkDelete(ids) {
     try {
       const params = {
-        RecordIds: ids.map(id => parseInt(id))
-      };
-
-      const response = await this.apperClient.deleteRecord(this.tableName, params);
+        RecordIds: ids
+      }
+      
+      const response = await this.apperClient.deleteRecord(this.tableName, params)
       
       if (!response.success) {
-        console.error(response.message);
-        throw new Error(response.message);
+        console.error(response.message)
+        return []
       }
-
+      
       if (response.results) {
-        const failedRecords = response.results.filter(result => !result.success);
+        const successfulDeletions = response.results.filter(result => result.success)
+        const failedDeletions = response.results.filter(result => !result.success)
         
-        if (failedRecords.length > 0) {
-          console.error(`Failed to delete ${failedRecords.length} records:${JSON.stringify(failedRecords)}`);
+        if (failedDeletions.length > 0) {
+          console.error(`Failed to delete ${failedDeletions.length} records:${JSON.stringify(failedDeletions)}`)
         }
+        
+        return successfulDeletions.map(result => result.recordId)
       }
-
-      return { success: true, deletedIds: ids };
+      
+      return []
     } catch (error) {
       if (error?.response?.data?.message) {
-        console.error("Error bulk deleting contacts:", error?.response?.data?.message);
-        throw new Error(error.response.data.message);
+        console.error("Error bulk deleting contacts:", error?.response?.data?.message)
       } else {
-        console.error("Error bulk deleting contacts:", error.message);
-        throw error;
+        console.error(error.message)
       }
+      return []
     }
   }
 }

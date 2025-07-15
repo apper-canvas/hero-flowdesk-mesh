@@ -1,21 +1,21 @@
-import { useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { useContext } from 'react';
-import { AuthContext } from '../../App';
+import { useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { useContext } from 'react'
+import { AuthContext } from '../../App'
 
 function Signup() {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { isInitialized } = useContext(AuthContext);
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const { isInitialized } = useContext(AuthContext)
   
   useEffect(() => {
     if (isInitialized) {
       // Show signup UI in this component
-      const { ApperUI } = window.ApperSDK;
-      ApperUI.showSignup("#authentication");
+      const { ApperUI } = window.ApperSDK
+      ApperUI.showSignup("#authentication")
     }
-  }, [isInitialized]);
+  }, [isInitialized])
   
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
@@ -44,7 +44,7 @@ function Signup() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-export default Signup;
+export default Signup
