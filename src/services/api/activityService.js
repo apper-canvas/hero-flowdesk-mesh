@@ -281,7 +281,6 @@ class ActivityService {
       }
       return []
     }
-  }
 }
 }
 
