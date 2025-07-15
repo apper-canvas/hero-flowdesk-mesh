@@ -12,6 +12,7 @@ import { contactService } from "@/services/api/contactService";
 const PipelineBoard = ({ 
   onEditDeal,
   onDeleteDeal,
+  onComposeEmail,
   className = "",
   ...props 
 }) => {
